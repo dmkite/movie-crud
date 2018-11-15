@@ -17,6 +17,7 @@ app.use((req, res, next) => {
 })
 
 app.use((err, req, res, next) => {
+    console.log(err)
     status = err. status || 500
     res.status(status).send(err.message)
 })

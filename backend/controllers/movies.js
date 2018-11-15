@@ -7,6 +7,10 @@ function getAllMovies(req, res, next){
         })
         .catch(error => {
             next(error)
+
+            /////////////////////////////////////////////////////
+            //          can just write .catch(next)
+            ////////////////////////////////////////////////////
         })
 }
 

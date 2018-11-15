@@ -1,9 +1,104 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+const server = require('./server-calls')
+
+function changeStars(){
+    const rating = Number(document.querySelector('#movieRating').value)
+    const stars = document.querySelectorAll('.material-icons')
+
+    for (let i = 0; i < 5; i++) {
+        if (i <= Math.floor(rating) - 1) {
+            stars[i].textContent = 'star'
+            continue
+        }
+        else stars[i].textContent = 'star_border'
+    }
+
+    if (rating % 1 !== 0) stars[Math.ceil(rating) - 1].textContent = 'star_half'
+}
+
+document.querySelector('#movieRating').addEventListener('focus', highlightStars)
+document.querySelector('#movieRating').addEventListener('focusout', unhighlightStars)
+
+function highlightStars(){
+    let stars = document.querySelectorAll('.ratingBox i')
+    stars.forEach(star => star.style.color = '#4db6ac ')
+    document.querySelector('.ratingBox label').style.color = '#4db6ac '
+}
+
+function unhighlightStars(){
+    let stars = document.querySelectorAll('.ratingBox i')
+    stars.forEach(star => star.style.color = '#111')
+    document.querySelector('.ratingBox label').style.color = '#111'
+}
+
+function displayPoster(e){
+    let posterURL = e.target.value
+    document.querySelector('.posterHolder').style.backgroundImage = `url('${posterURL}')`
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//      Create Movie
+///////////////////////////////////////////////////////////////////////////////
+
+function createMovie(e){
+    e.preventDefault()
+    let postBody = createPostBody()
+    server.createMovie(postBody)
+        .then(data => {
+            creationAlert(data.data.data[0].title)
+            clearForm()
+        })
+
+}
+
+function createPostBody(){
+    let inputs = Array.from(document.querySelectorAll('.newMovieForm input'))
+
+    let postBody = inputs.reduce( (acc, input) => {
+        acc[input.name] = input.value
+        return acc
+    }, {})
+    return postBody
+}
+
+function creationAlert(title) {
+    let newAlert = `
+    <p class="creationAlert">${title} has been added</p>`
+    document.querySelector('body').innerHTML += newAlert
+    setTimeout(
+        function () {
+            document.querySelector('.creationAlert').classList.add('fadeOut')
+            setTimeout(
+                function () { document.querySelector('.creationAlert').remove() },
+                1000
+            )
+        }, 3000)
+}
+
+function clearForm(){
+    inputs = document.querySelectorAll('.newMovieForm inputs')
+    inputs.forEach( input => input.value = '')
+    document.querySelector('.posterHolder').style.backgroundImage = ''
+}
+//duplicate for 'touchmove'
+
+module.exports = {changeStars, displayPoster, createMovie}
+},{"./server-calls":31}],2:[function(require,module,exports){
 const movies = require('./movies')
+const create = require('./create')
 
+// console.log(window.location.href)
+if (window.location.href.endsWith('/movies.html')) document.addEventListener('DOMContentLoaded', movies.addToTable)
 
-document.addEventListener('DOMContentLoaded', movies.addToTable)
-},{"./movies":2}],2:[function(require,module,exports){
+if (window.location.href.endsWith('/create.html')){ 
+    document.querySelector('#movieRating').addEventListener('mousemove', create.changeStars)
+    document.querySelector('#movieRating').addEventListener('keydown', create.changeStars)
+    document.querySelector('#movieRating').addEventListener('keyup', create.changeStars)
+    document.querySelector('#movieRating').addEventListener('touchmove', create.changeStars)
+    document.querySelector('#posterURL').addEventListener('change', function (e) { create.displayPoster(e) })
+    document.querySelector('.newMovieForm').addEventListener('submit', function(e){create.createMovie(e)})
+}
+},{"./create":1,"./movies":3}],3:[function(require,module,exports){
 const server = require('./server-calls')
 const { addListener } = require('./utils')
 
@@ -44,17 +139,13 @@ function tablify(item){
         </td>
     </tr>`
 }
-///////////////////////////////////////////////////////////////////////////////
-//      Create Movie
-///////////////////////////////////////////////////////////////////////////////
-
-
 
 
 ///////////////////////////////////////////////////////////////////////////////
 //      Delete Movie
 ///////////////////////////////////////////////////////////////////////////////
 function deleteMovie(e){
+    e.preventDefault()
     const id = e.target.parentElement.parentElement.id
     server.deleteMovie(id)
         .then(data => {
@@ -79,9 +170,9 @@ function deletionAlert(title){
 }
 
 module.exports = {addToTable}
-},{"./server-calls":30,"./utils":31}],3:[function(require,module,exports){
+},{"./server-calls":31,"./utils":32}],4:[function(require,module,exports){
 module.exports = require('./lib/axios');
-},{"./lib/axios":5}],4:[function(require,module,exports){
+},{"./lib/axios":6}],5:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -265,7 +356,7 @@ module.exports = function xhrAdapter(config) {
 };
 
 }).call(this,require('_process'))
-},{"../core/createError":11,"./../core/settle":14,"./../helpers/btoa":18,"./../helpers/buildURL":19,"./../helpers/cookies":21,"./../helpers/isURLSameOrigin":23,"./../helpers/parseHeaders":25,"./../utils":27,"_process":29}],5:[function(require,module,exports){
+},{"../core/createError":12,"./../core/settle":15,"./../helpers/btoa":19,"./../helpers/buildURL":20,"./../helpers/cookies":22,"./../helpers/isURLSameOrigin":24,"./../helpers/parseHeaders":26,"./../utils":28,"_process":30}],6:[function(require,module,exports){
 'use strict';
 
 var utils = require('./utils');
@@ -319,7 +410,7 @@ module.exports = axios;
 // Allow use of default import syntax in TypeScript
 module.exports.default = axios;
 
-},{"./cancel/Cancel":6,"./cancel/CancelToken":7,"./cancel/isCancel":8,"./core/Axios":9,"./defaults":16,"./helpers/bind":17,"./helpers/spread":26,"./utils":27}],6:[function(require,module,exports){
+},{"./cancel/Cancel":7,"./cancel/CancelToken":8,"./cancel/isCancel":9,"./core/Axios":10,"./defaults":17,"./helpers/bind":18,"./helpers/spread":27,"./utils":28}],7:[function(require,module,exports){
 'use strict';
 
 /**
@@ -340,7 +431,7 @@ Cancel.prototype.__CANCEL__ = true;
 
 module.exports = Cancel;
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 'use strict';
 
 var Cancel = require('./Cancel');
@@ -399,14 +490,14 @@ CancelToken.source = function source() {
 
 module.exports = CancelToken;
 
-},{"./Cancel":6}],8:[function(require,module,exports){
+},{"./Cancel":7}],9:[function(require,module,exports){
 'use strict';
 
 module.exports = function isCancel(value) {
   return !!(value && value.__CANCEL__);
 };
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 'use strict';
 
 var defaults = require('./../defaults');
@@ -487,7 +578,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = Axios;
 
-},{"./../defaults":16,"./../utils":27,"./InterceptorManager":10,"./dispatchRequest":12}],10:[function(require,module,exports){
+},{"./../defaults":17,"./../utils":28,"./InterceptorManager":11,"./dispatchRequest":13}],11:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -541,7 +632,7 @@ InterceptorManager.prototype.forEach = function forEach(fn) {
 
 module.exports = InterceptorManager;
 
-},{"./../utils":27}],11:[function(require,module,exports){
+},{"./../utils":28}],12:[function(require,module,exports){
 'use strict';
 
 var enhanceError = require('./enhanceError');
@@ -561,7 +652,7 @@ module.exports = function createError(message, config, code, request, response) 
   return enhanceError(error, config, code, request, response);
 };
 
-},{"./enhanceError":13}],12:[function(require,module,exports){
+},{"./enhanceError":14}],13:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -649,7 +740,7 @@ module.exports = function dispatchRequest(config) {
   });
 };
 
-},{"../cancel/isCancel":8,"../defaults":16,"./../helpers/combineURLs":20,"./../helpers/isAbsoluteURL":22,"./../utils":27,"./transformData":15}],13:[function(require,module,exports){
+},{"../cancel/isCancel":9,"../defaults":17,"./../helpers/combineURLs":21,"./../helpers/isAbsoluteURL":23,"./../utils":28,"./transformData":16}],14:[function(require,module,exports){
 'use strict';
 
 /**
@@ -672,7 +763,7 @@ module.exports = function enhanceError(error, config, code, request, response) {
   return error;
 };
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 'use strict';
 
 var createError = require('./createError');
@@ -700,7 +791,7 @@ module.exports = function settle(resolve, reject, response) {
   }
 };
 
-},{"./createError":11}],15:[function(require,module,exports){
+},{"./createError":12}],16:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -722,7 +813,7 @@ module.exports = function transformData(data, headers, fns) {
   return data;
 };
 
-},{"./../utils":27}],16:[function(require,module,exports){
+},{"./../utils":28}],17:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -822,7 +913,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 module.exports = defaults;
 
 }).call(this,require('_process'))
-},{"./adapters/http":4,"./adapters/xhr":4,"./helpers/normalizeHeaderName":24,"./utils":27,"_process":29}],17:[function(require,module,exports){
+},{"./adapters/http":5,"./adapters/xhr":5,"./helpers/normalizeHeaderName":25,"./utils":28,"_process":30}],18:[function(require,module,exports){
 'use strict';
 
 module.exports = function bind(fn, thisArg) {
@@ -835,7 +926,7 @@ module.exports = function bind(fn, thisArg) {
   };
 };
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 'use strict';
 
 // btoa polyfill for IE<10 courtesy https://github.com/davidchambers/Base64.js
@@ -873,7 +964,7 @@ function btoa(input) {
 
 module.exports = btoa;
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -941,7 +1032,7 @@ module.exports = function buildURL(url, params, paramsSerializer) {
   return url;
 };
 
-},{"./../utils":27}],20:[function(require,module,exports){
+},{"./../utils":28}],21:[function(require,module,exports){
 'use strict';
 
 /**
@@ -957,7 +1048,7 @@ module.exports = function combineURLs(baseURL, relativeURL) {
     : baseURL;
 };
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -1012,7 +1103,7 @@ module.exports = (
   })()
 );
 
-},{"./../utils":27}],22:[function(require,module,exports){
+},{"./../utils":28}],23:[function(require,module,exports){
 'use strict';
 
 /**
@@ -1028,7 +1119,7 @@ module.exports = function isAbsoluteURL(url) {
   return /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url);
 };
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -1098,7 +1189,7 @@ module.exports = (
   })()
 );
 
-},{"./../utils":27}],24:[function(require,module,exports){
+},{"./../utils":28}],25:[function(require,module,exports){
 'use strict';
 
 var utils = require('../utils');
@@ -1112,7 +1203,7 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
   });
 };
 
-},{"../utils":27}],25:[function(require,module,exports){
+},{"../utils":28}],26:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -1167,7 +1258,7 @@ module.exports = function parseHeaders(headers) {
   return parsed;
 };
 
-},{"./../utils":27}],26:[function(require,module,exports){
+},{"./../utils":28}],27:[function(require,module,exports){
 'use strict';
 
 /**
@@ -1196,7 +1287,7 @@ module.exports = function spread(callback) {
   };
 };
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 'use strict';
 
 var bind = require('./helpers/bind');
@@ -1501,7 +1592,7 @@ module.exports = {
   trim: trim
 };
 
-},{"./helpers/bind":17,"is-buffer":28}],28:[function(require,module,exports){
+},{"./helpers/bind":18,"is-buffer":29}],29:[function(require,module,exports){
 /*!
  * Determine if an object is a Buffer
  *
@@ -1524,7 +1615,7 @@ function isSlowBuffer (obj) {
   return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
 }
 
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -1710,7 +1801,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 const axios = require('axios')
 const baseURL = 'http://localhost:3000/movies'
 
@@ -1728,8 +1819,12 @@ function deleteMovie(id){
         })
 }
 
-module.exports = {getAll, deleteMovie}
-},{"axios":3}],31:[function(require,module,exports){
+function createMovie(postBody){
+    return axios.post(baseURL, postBody)
+}
+
+module.exports = {getAll, deleteMovie, createMovie}
+},{"axios":4}],32:[function(require,module,exports){
 function addListener(iterable, trigger, fn){
     let iterables = document.querySelectorAll(iterable)
     iterables.forEach(iter => {
@@ -1738,4 +1833,4 @@ function addListener(iterable, trigger, fn){
 }
 
 module.exports = {addListener}
-},{}]},{},[1]);
+},{}]},{},[2]);

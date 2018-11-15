@@ -15,4 +15,8 @@ function deleteMovie(id){
         })
 }
 
-module.exports = {getAll, deleteMovie}
+function createMovie(postBody){
+    return axios.post(baseURL, postBody)
+}
+
+module.exports = {getAll, deleteMovie, createMovie}
