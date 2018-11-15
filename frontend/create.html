@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+    <script defer src="create.js"></script>
+</head>
+
+<body>
+    <header>
+        <h1><span>C</span>inema <span>R</span>eviewer's <span>U</span>nion of <span>D</span>etroit</h1>
+        <nav>
+            <a href="movies.html">Movies</a>
+        </nav>
+    </header>
+    <main>
+        <form class="newMovieForm">
+            <input type="text" id="movieTitle">
+            <label for="movieTitle">Title</label>
+            
+            <input type="text" id="movieDirector">
+            <label for="movieDirector">Director</label>
+
+            <input type="text" id="movieYear">
+            <label for="movieYear">Year</label>
+            
+        
+            <div class="ratingBox">
+                <span class="stars">
+                    <i class="material-icons">star</i>
+                    <i class="material-icons">star</i>
+                    <i class="material-icons">star</i>
+                    <i class="material-icons">star_border</i>
+                    <i class="material-icons">star_border</i>
+                </span>
+                <!-- <i class="material-icons">star_half</i>
+                <i class="material-icons">star</i> -->
+                <input id="movieRating" type="range" min="1" max="5" step="0.5">
+            </div>
+            <label for="movieRating">Rating</label>
+        </form>
+        
+    </main>
+
+</body>
+
+</html>

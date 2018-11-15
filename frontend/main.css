@@ -1,0 +1,45 @@
+.alert{
+    background-color: #fce4ec;
+    border:2px solid #d81b60;
+    color: #d81b60;
+    position:absolute;
+    animation: slideout 1s ease-out;
+    width:250px;
+    right:0;
+    top:0;
+}
+
+@keyframes slideout{
+    0%{right:-300px; top:0;}
+    100%{right:0; top: 0;}
+}
+.fadeOut{
+    animation: fadeOut 1s ease-in;
+}
+
+@keyframes fadeOut{
+    0%{opacity:1;}
+    100%{opacity:0}
+}
+
+.hidden{
+    display:none;
+}
+
+.ratingBox{
+    width:133px;
+    position:relative;
+    height:20px;
+    /* margin:0;  */
+    padding:0;
+    margin-top:5px;
+}
+
+.ratingBox input{
+    position:absolute;
+    top:-15px;
+    outline:1px dotted red;
+    height:20px;
+    opacity:0;
+}
+
