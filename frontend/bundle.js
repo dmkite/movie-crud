@@ -1,36 +1,24 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 const server = require('./server-calls')
-const movies = require('./movies')
 const {newAlert} = require('./utils')
 
+///////////////////////////////////////////////////////////////////////////////
+//      Star Range JS
+///////////////////////////////////////////////////////////////////////////////
 function changeStars(){
     const rating = Number(document.querySelector('#movieRating').value)
-    const stars = document.querySelectorAll('.material-icons')
-
+    const stars = document.querySelectorAll('.ratingBox .material-icons')
     for (let i = 0; i < 5; i++) {
-        if (i <= Math.floor(rating) - 1) {
-            stars[i].textContent = 'star'
-            continue
-        }
+        if (i <= Math.floor(rating) - 1) stars[i].textContent = 'star'
         else stars[i].textContent = 'star_border'
     }
-
     if (rating % 1 !== 0) stars[Math.ceil(rating) - 1].textContent = 'star_half'
 }
 
-// document.querySelector('#movieRating').addEventListener('focus', highlightStars)
-// document.querySelector('#movieRating').addEventListener('focusout', unhighlightStars)
-
-function highlightStars(){
+function changeStarColor(color){
     let stars = document.querySelectorAll('.ratingBox i')
-    stars.forEach(star => star.style.color = '#4db6ac ')
-    document.querySelector('.ratingBox label').style.color = '#4db6ac '
-}
-
-function unhighlightStars(){
-    let stars = document.querySelectorAll('.ratingBox i')
-    stars.forEach(star => star.style.color = '#111')
-    document.querySelector('.ratingBox label').style.color = '#111'
+    stars.forEach(star => star.style.color = color)
+    document.querySelector('.ratingBox label').style.color = color    
 }
 
 function displayPoster(e){
@@ -47,7 +35,7 @@ function createMovie(e){
     let postBody = createPostBody()
     server.createMovie(postBody)
         .then(data => {
-            newAlert(data.data.data[0].title, 'creation')
+            newAlert(data.data.data[0].title, 'creation', 'created')
             clearForm()
         })
 
@@ -70,44 +58,54 @@ function clearForm(){
     inputs.forEach( input => input.value = '')
     document.querySelector('.posterHolder').style.backgroundImage = ''
 }
-//duplicate for 'touchmove'
 
-module.exports = {changeStars, displayPoster, createMovie, createPostBody, changeStars, highlightStars, unhighlightStars, displayPoster}
-},{"./movies":3,"./server-calls":31,"./utils":32}],2:[function(require,module,exports){
+module.exports = {changeStars, displayPoster, createMovie, createPostBody, changeStars, changeStarColor, displayPoster}
+},{"./server-calls":31,"./utils":32}],2:[function(require,module,exports){
 const movies = require('./movies')
 const create = require('./create')
 const {posters, posterBacks, addMultipleListeners, mediaQuery, windowSize} = require('./utils')
 
+///////////////////////////////////////////////////////////////////////////////
+//      index.html JS
+///////////////////////////////////////////////////////////////////////////////
 if (!!document.querySelector('.posterPage')){
-    
-    HTMLPosters = posters.reduce( (acc, poster) => {
-        let rand = (Math.floor(Math.random() * posterBacks.length))
-        acc.push(`<div class="card-wrapper">
-            <div class="card">
-                <div class="card-front" style="background-image:url('${poster}')"></div>
-                <div class="card-back" style="background-image:url('${posterBacks[rand]}')"></div>
-            </div>
-        </div>`)
-        return acc
-    }, [])
-    
-    document.querySelector('.posterPage').innerHTML = HTMLPosters.join('')
+    function addPosters(){
+        HTMLPosters = posters.reduce( (acc, poster) => {
+            let rand = (Math.floor(Math.random() * posterBacks.length))
+            acc.push(`<div class="card-wrapper">
+                <div class="card">
+                    <div class="card-front" style="background-image:url('${poster}')"></div>
+                    <div class="card-back" style="background-image:url('${posterBacks[rand]}')"></div>
+                </div>
+            </div>`)
+            return acc
+        }, [])
+        
+        document.querySelector('.posterPage').innerHTML = HTMLPosters.join('')
+    }
 
-    const flipping = setInterval(
-        function(){
-            const cards = document.querySelectorAll('.card')
-            let rand =  Math.floor(Math.random() * cards.length)
-            cards[rand].classList.toggle('do-flip')
-        }, 1500)
+    function addAnimation(){
+        const flipping = setInterval(
+            function(){
+                const cards = document.querySelectorAll('.card')
+                let rand =  Math.floor(Math.random() * cards.length)
+                cards[rand].classList.toggle('do-flip')
+            }, 1500)
 
-    const flipping2 = setInterval(
-        function () {
-            const cards = document.querySelectorAll('.card')
-            let rand = Math.floor(Math.random() * cards.length)
-            cards[rand].classList.toggle('do-flip')
-        }, 3333)
+        const flipping2 = setInterval(
+            function () {
+                const cards = document.querySelectorAll('.card')
+                let rand = Math.floor(Math.random() * cards.length)
+                cards[rand].classList.toggle('do-flip')
+            }, 3333)
+    }
+    addPosters()
+    addAnimation()
 }
 
+///////////////////////////////////////////////////////////////////////////////
+//      movie.html JS
+///////////////////////////////////////////////////////////////////////////////
 if (window.location.href.endsWith('/movies.html')){
     document.addEventListener('DOMContentLoaded', movies.addToTable)
     document.addEventListener('DOMContentLoaded', mediaQuery)
@@ -115,17 +113,23 @@ if (window.location.href.endsWith('/movies.html')){
 
 } 
 
+///////////////////////////////////////////////////////////////////////////////
+//      create.html JS
+///////////////////////////////////////////////////////////////////////////////
 if (window.location.href.endsWith('/create.html')){ 
-    addMultipleListeners('#movieRating', ['mousemove', 'keydown', 'keyup', 'touchmove'], create.changeStars)
+    addMultipleListeners('#movieRating', ['mousemove', 'keydown', 'keyup', 'touchmove', 'touch'], create.changeStars)
     document.querySelector('#posterURL').addEventListener('change', function (e) { create.displayPoster(e) })
     document.querySelector('.newMovieForm').addEventListener('submit', function(e){create.createMovie(e)})
-    document.querySelector('#movieRating').addEventListener('focus', create.highlightStars)
-    document.querySelector('#movieRating').addEventListener('focusout', create.unhighlightStars)
+
+    const stars = document.querySelectorAll('.ratingBox i')
+    
+    document.querySelector('#movieRating').addEventListener('focus', function () { create.changeStarColor('#4db6ac')})
+    document.querySelector('#movieRating').addEventListener('focusout', function(){create.changeStarColor('#111')})
 }
 },{"./create":1,"./movies":3,"./utils":32}],3:[function(require,module,exports){
 const server = require('./server-calls')
 const create = require('./create')
-const { addListener, newAlert } = require('./utils')
+const { addListener, newAlert, mediaQuery, windowSize, addMultipleListeners } = require('./utils')
 
 ///////////////////////////////////////////////////////////////////////////////
 //      Initial Setup
@@ -139,6 +143,7 @@ function addToTable(){
             document.querySelector('.movieTable').innerHTML += htmlArray.join('')
             addListener('.delete', 'click', function(e){deleteMovie(e)})
             addListener('.edit', 'click', function(e){createEditPage(e)})
+            mediaQuery(windowSize)
         }) 
 }
 
@@ -173,12 +178,11 @@ function tablify(item){
 ///////////////////////////////////////////////////////////////////////////////
 
 function deleteMovie(e){
-    console.log('firing')
-    // e.preventDefault()
-    const id = e.target.parentElement.parentElement.id
+    let id = Number(e.target.parentElement.parentElement.id)
+    if(!id) id = Number(e.target.parentElement.parentElement.parentElement.id)
     server.deleteMovie(id)
         .then(data => {
-            newAlert(data.data.data[0].title, 'deletion')
+            newAlert(data.data.data[0].title, 'deletion', 'deleted')
             document.querySelector('.movieTable').innerHTML = ''
             return addToTable()
         })
@@ -190,7 +194,6 @@ function deleteMovie(e){
 ///////////////////////////////////////////////////////////////////////////////
 
 function createEditPage(e){
-    console.log('firing too')
     const id = e.target.parentElement.parentElement.id
     server.getOne(id)
     .then(data => {
@@ -199,29 +202,22 @@ function createEditPage(e){
         document.querySelector('.confirm').addEventListener('click', function(e){submitChanges(e)})
         addWatchers()
     })
-    
-    
 }
 
 function addWatchers(){
-    document.querySelector('#movieRating').addEventListener('mousemove', create.changeStars)
-    document.querySelector('#movieRating').addEventListener('keydown', create.changeStars)
-    document.querySelector('#movieRating').addEventListener('keyup', create.changeStars)
-    document.querySelector('#movieRating').addEventListener('touchmove', create.changeStars)
     document.querySelector('#posterURL').addEventListener('change', function (e) { create.displayPoster(e) })
-    document.querySelector('#movieRating').addEventListener('focus', create.highlightStars)
-    document.querySelector('#movieRating').addEventListener('focusout', create.unhighlightStars)
+    addMultipleListeners('#movieRating', ['mousemove', 'keydown', 'keyup', 'touchmove', 'touch'], create.changeStars)
+    document.querySelector('#posterURL').addEventListener('change', function (e) { create.displayPoster(e) })
 }
 
 function createEditHTML(movieInfo){
     return `
     <div class="editPage">
+        
         <div class="row">
-            <div class="col s1 m6">
-                <div class="posterHolder" style="background-image:url('${movieInfo.poster_url}')"></div>
-            </div>
 
-            <div class="col s1 m6">
+            <div class="col s12 m8">
+                <h3>Edit ${movieInfo.title}</h3>
                 <form class="newMovieForm">
                     <input type="text" id="movieTitle" name="title" required value="${movieInfo.title}">
                     <label for="movieTitle">Title</label>
@@ -241,8 +237,6 @@ function createEditHTML(movieInfo){
                             <i class="material-icons">star_border</i>
                             <i class="material-icons">star_border</i>
                         </span>
-                        <!-- <i class="material-icons">star_half</i>
-                        <i class="material-icons">star</i> -->
                         <input id="movieRating" name="rating" type="range" min="1" max="5" step="0.5" value="${movieInfo.rating}">
                         <label for="movieRating">Rating</label>
                     </div>
@@ -254,7 +248,13 @@ function createEditHTML(movieInfo){
                     <button type="button" id="${movieInfo.id}" class="confirm btn-small waves-effect">confirm</button>
                     <button type="button" class="cancel btn-small waves-effect">cancel</button>
                 </form>
+
             </div>
+
+            <div class="col s12 m4">
+                <div class="posterHolder" style="background-image:url('${movieInfo.poster_url}')"></div>
+            </div>
+        </div>
     </div>`
 }
 
@@ -271,7 +271,6 @@ function minimize(e){
 
 function submitChanges(e){
     const id = Number(e.target.id)
-    
     let putBody = create.createPostBody()
     server.editMovie(id, putBody)
     .then(() =>{
@@ -1954,6 +1953,9 @@ function editMovie(id, putBody){
 
 module.exports = {getAll, getOne, deleteMovie, createMovie, editMovie}
 },{"axios":4}],32:[function(require,module,exports){
+///////////////////////////////////////////////////////////////////////////////
+//      Listeners and Alerts
+///////////////////////////////////////////////////////////////////////////////
 function addListener(iterable, trigger, fn){
     let iterables = document.querySelectorAll(iterable)
     iterables.forEach(iter => {
@@ -1968,10 +1970,10 @@ function addMultipleListeners(element, triggerArray, fn){
     })
 }
 
-function newAlert(title, type) {
+function newAlert(title, type, verb) {
     let newAlert = `
-    <p class="${type}Alert">${title} has been added</p>`
-    document.querySelector('.alertHolder').innerHTML += newAlert
+    <p class="${type}Alert">${title} has been ${verb}</p>`
+    document.querySelector('body').innerHTML += newAlert
     setTimeout(
         function () {
             document.querySelector(`.${type}Alert`).classList.add('fadeOut')
@@ -1982,6 +1984,9 @@ function newAlert(title, type) {
         }, 3000)
 }
 
+///////////////////////////////////////////////////////////////////////////////
+//      Poster data
+///////////////////////////////////////////////////////////////////////////////
 const posters =
     ['https://image.tmdb.org/t/p/w185_and_h278_bestv2/lHu1wtNaczFPGFDTrjCSzeLPTKN.jpg',
         'https://image.tmdb.org/t/p/w185_and_h278_bestv2/x1txcDXkcM65gl7w20PwYSxAYah.jpg',
@@ -2002,7 +2007,47 @@ const posters =
         'https://image.tmdb.org/t/p/w185_and_h278_bestv2/bXs0zkv2iGVViZEy78teg2ycDBm.jpg',
         'https://image.tmdb.org/t/p/w185_and_h278_bestv2/to0spRl1CMDvyUbOnbb4fTk3VAd.jpg',
         'https://image.tmdb.org/t/p/w185_and_h278_bestv2/rT49ousKUWN3dV7UlhaC9onTNdl.jpg',
-        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/9qYKrgzHbYtKej9Gvd7NxJvGiC2.jpg']
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/9qYKrgzHbYtKej9Gvd7NxJvGiC2.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/4Y1AlIP3SIOTje3ky9p68XhQmHU.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/h70wRv6iWxiqED4orqfxcEl74Rc.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/e7ACYk5KSDRKYBHcwQVcojxJknN.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/6jBuc4l7ixM8S5PCcSYvGKDmIX9.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/huSncs4RyvQDBmHjBBYHSBYJbSJ.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/ahF5c6vyP8HWMqIwlhecbRALkjq.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/e3P2Ed0sbmQ6RsoS4dcT3aeEPR.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/lfJSDT8KYk5k34AEw1eTa4ahscL.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/7rUnZrcSyfwfloeI5aoccztSLSg.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/AfybH6GbGFw1F9bcETe2yu25mIE.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/94RaS52zmsqaiAe1TG20pdbJCZr.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/hKHZhUbIyUAjcSrqJThFGYIR6kI.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/iOMkwo6X4vyNtpanM84TX4m8poT.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/5IPrT71JTNxPTClpzzytRhkGTkk.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/v5HlmJK9bdeHxN2QhaFP1ivjX3U.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/SDbTy4IzTFnxvGycW7cePjEDDP.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/anIVgBJyG3fKnCuBshCfiJBsR8z.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/jjPJ4s3DWZZvI4vw8Xfi4Vqa1Q8.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/8fDtXi6gVw8WUMWGT9XFz7YwkuE.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/p2HbBHBx2yog6cWPKJDwMlYZauf.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/4nKoB6wMVXfsYgRZK5lHZ5VMQ6J.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/pU1ULUq8D3iRxl1fdX2lZIzdHuI.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/55W6mUVv4CXMMQHHhV2zXtLSpXQ.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/dOtenLPIbTUZ8dcYKEA7T7qRURz.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/gjAFM4xhA5vyLxxKMz38ujlUfDL.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/qcnOKCPleLOTWPPgYI0YT1MOQwR.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/3gIO6mCd4Q4PF1tuwcyI3sjFrtI.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/nAU74GmpUk7t5iklEp3bufwDq4n.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/wJhvud2zC8AzrKOH7nEGK3ObaIV.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/tj4lbeWQBvPwGjadEAAjJdQolko.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/zfDN0YX1BNRsnCnp1mWOaiGeN9y.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/gjAFM4xhA5vyLxxKMz38ujlUfDL.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/qcnOKCPleLOTWPPgYI0YT1MOQwR.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/3gIO6mCd4Q4PF1tuwcyI3sjFrtI.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/nAU74GmpUk7t5iklEp3bufwDq4n.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/wJhvud2zC8AzrKOH7nEGK3ObaIV.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/tj4lbeWQBvPwGjadEAAjJdQolko.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/zfDN0YX1BNRsnCnp1mWOaiGeN9y.jpg'
+
+    ]
 
 const posterBacks = [
     'https://image.tmdb.org/t/p/w185_and_h278_bestv2/x2I7eZNMDZKPUFM6QuKkmHKZDQm.jpg',
@@ -2019,9 +2064,17 @@ const posterBacks = [
     'https://image.tmdb.org/t/p/w185_and_h278_bestv2/55W6mUVv4CXMMQHHhV2zXtLSpXQ.jpg',
     'https://image.tmdb.org/t/p/w185_and_h278_bestv2/dOtenLPIbTUZ8dcYKEA7T7qRURz.jpg',
     'https://image.tmdb.org/t/p/w185_and_h278_bestv2/gjAFM4xhA5vyLxxKMz38ujlUfDL.jpg',
-    'https://image.tmdb.org/t/p/w185_and_h278_bestv2/qcnOKCPleLOTWPPgYI0YT1MOQwR.jpg']
+    'https://image.tmdb.org/t/p/w185_and_h278_bestv2/qcnOKCPleLOTWPPgYI0YT1MOQwR.jpg',
+    'https://image.tmdb.org/t/p/w185_and_h278_bestv2/3gIO6mCd4Q4PF1tuwcyI3sjFrtI.jpg',
+    'https://image.tmdb.org/t/p/w185_and_h278_bestv2/nAU74GmpUk7t5iklEp3bufwDq4n.jpg',
+    'https://image.tmdb.org/t/p/w185_and_h278_bestv2/wJhvud2zC8AzrKOH7nEGK3ObaIV.jpg',
+    'https://image.tmdb.org/t/p/w185_and_h278_bestv2/tj4lbeWQBvPwGjadEAAjJdQolko.jpg',
+    'https://image.tmdb.org/t/p/w185_and_h278_bestv2/zfDN0YX1BNRsnCnp1mWOaiGeN9y.jpg'
+]
 
-
+///////////////////////////////////////////////////////////////////////////////
+//     Media Queries
+///////////////////////////////////////////////////////////////////////////////
 const windowSize = window.matchMedia("(max-width: 450px)")
 
 function mediaQuery(windowSize){

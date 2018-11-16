@@ -1,3 +1,6 @@
+///////////////////////////////////////////////////////////////////////////////
+//      Listeners and Alerts
+///////////////////////////////////////////////////////////////////////////////
 function addListener(iterable, trigger, fn){
     let iterables = document.querySelectorAll(iterable)
     iterables.forEach(iter => {
@@ -12,10 +15,10 @@ function addMultipleListeners(element, triggerArray, fn){
     })
 }
 
-function newAlert(title, type) {
+function newAlert(title, type, verb) {
     let newAlert = `
-    <p class="${type}Alert">${title} has been added</p>`
-    document.querySelector('.alertHolder').innerHTML += newAlert
+    <p class="${type}Alert">${title} has been ${verb}</p>`
+    document.querySelector('body').innerHTML += newAlert
     setTimeout(
         function () {
             document.querySelector(`.${type}Alert`).classList.add('fadeOut')
@@ -26,6 +29,9 @@ function newAlert(title, type) {
         }, 3000)
 }
 
+///////////////////////////////////////////////////////////////////////////////
+//      Poster data
+///////////////////////////////////////////////////////////////////////////////
 const posters =
     ['https://image.tmdb.org/t/p/w185_and_h278_bestv2/lHu1wtNaczFPGFDTrjCSzeLPTKN.jpg',
         'https://image.tmdb.org/t/p/w185_and_h278_bestv2/x1txcDXkcM65gl7w20PwYSxAYah.jpg',
@@ -46,7 +52,47 @@ const posters =
         'https://image.tmdb.org/t/p/w185_and_h278_bestv2/bXs0zkv2iGVViZEy78teg2ycDBm.jpg',
         'https://image.tmdb.org/t/p/w185_and_h278_bestv2/to0spRl1CMDvyUbOnbb4fTk3VAd.jpg',
         'https://image.tmdb.org/t/p/w185_and_h278_bestv2/rT49ousKUWN3dV7UlhaC9onTNdl.jpg',
-        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/9qYKrgzHbYtKej9Gvd7NxJvGiC2.jpg']
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/9qYKrgzHbYtKej9Gvd7NxJvGiC2.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/4Y1AlIP3SIOTje3ky9p68XhQmHU.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/h70wRv6iWxiqED4orqfxcEl74Rc.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/e7ACYk5KSDRKYBHcwQVcojxJknN.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/6jBuc4l7ixM8S5PCcSYvGKDmIX9.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/huSncs4RyvQDBmHjBBYHSBYJbSJ.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/ahF5c6vyP8HWMqIwlhecbRALkjq.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/e3P2Ed0sbmQ6RsoS4dcT3aeEPR.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/lfJSDT8KYk5k34AEw1eTa4ahscL.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/7rUnZrcSyfwfloeI5aoccztSLSg.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/AfybH6GbGFw1F9bcETe2yu25mIE.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/94RaS52zmsqaiAe1TG20pdbJCZr.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/hKHZhUbIyUAjcSrqJThFGYIR6kI.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/iOMkwo6X4vyNtpanM84TX4m8poT.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/5IPrT71JTNxPTClpzzytRhkGTkk.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/v5HlmJK9bdeHxN2QhaFP1ivjX3U.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/SDbTy4IzTFnxvGycW7cePjEDDP.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/anIVgBJyG3fKnCuBshCfiJBsR8z.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/jjPJ4s3DWZZvI4vw8Xfi4Vqa1Q8.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/8fDtXi6gVw8WUMWGT9XFz7YwkuE.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/p2HbBHBx2yog6cWPKJDwMlYZauf.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/4nKoB6wMVXfsYgRZK5lHZ5VMQ6J.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/pU1ULUq8D3iRxl1fdX2lZIzdHuI.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/55W6mUVv4CXMMQHHhV2zXtLSpXQ.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/dOtenLPIbTUZ8dcYKEA7T7qRURz.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/gjAFM4xhA5vyLxxKMz38ujlUfDL.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/qcnOKCPleLOTWPPgYI0YT1MOQwR.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/3gIO6mCd4Q4PF1tuwcyI3sjFrtI.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/nAU74GmpUk7t5iklEp3bufwDq4n.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/wJhvud2zC8AzrKOH7nEGK3ObaIV.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/tj4lbeWQBvPwGjadEAAjJdQolko.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/zfDN0YX1BNRsnCnp1mWOaiGeN9y.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/gjAFM4xhA5vyLxxKMz38ujlUfDL.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/qcnOKCPleLOTWPPgYI0YT1MOQwR.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/3gIO6mCd4Q4PF1tuwcyI3sjFrtI.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/nAU74GmpUk7t5iklEp3bufwDq4n.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/wJhvud2zC8AzrKOH7nEGK3ObaIV.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/tj4lbeWQBvPwGjadEAAjJdQolko.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/zfDN0YX1BNRsnCnp1mWOaiGeN9y.jpg'
+
+    ]
 
 const posterBacks = [
     'https://image.tmdb.org/t/p/w185_and_h278_bestv2/x2I7eZNMDZKPUFM6QuKkmHKZDQm.jpg',
@@ -63,9 +109,17 @@ const posterBacks = [
     'https://image.tmdb.org/t/p/w185_and_h278_bestv2/55W6mUVv4CXMMQHHhV2zXtLSpXQ.jpg',
     'https://image.tmdb.org/t/p/w185_and_h278_bestv2/dOtenLPIbTUZ8dcYKEA7T7qRURz.jpg',
     'https://image.tmdb.org/t/p/w185_and_h278_bestv2/gjAFM4xhA5vyLxxKMz38ujlUfDL.jpg',
-    'https://image.tmdb.org/t/p/w185_and_h278_bestv2/qcnOKCPleLOTWPPgYI0YT1MOQwR.jpg']
+    'https://image.tmdb.org/t/p/w185_and_h278_bestv2/qcnOKCPleLOTWPPgYI0YT1MOQwR.jpg',
+    'https://image.tmdb.org/t/p/w185_and_h278_bestv2/3gIO6mCd4Q4PF1tuwcyI3sjFrtI.jpg',
+    'https://image.tmdb.org/t/p/w185_and_h278_bestv2/nAU74GmpUk7t5iklEp3bufwDq4n.jpg',
+    'https://image.tmdb.org/t/p/w185_and_h278_bestv2/wJhvud2zC8AzrKOH7nEGK3ObaIV.jpg',
+    'https://image.tmdb.org/t/p/w185_and_h278_bestv2/tj4lbeWQBvPwGjadEAAjJdQolko.jpg',
+    'https://image.tmdb.org/t/p/w185_and_h278_bestv2/zfDN0YX1BNRsnCnp1mWOaiGeN9y.jpg'
+]
 
-
+///////////////////////////////////////////////////////////////////////////////
+//     Media Queries
+///////////////////////////////////////////////////////////////////////////////
 const windowSize = window.matchMedia("(max-width: 450px)")
 
 function mediaQuery(windowSize){

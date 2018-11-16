@@ -15,7 +15,7 @@
 <body>
     <header>
         <nav class="nav-wrapper">
-            <h1>movie<br>CRUD</h1>
+            <a href="index.html"><h1>movie<br>CRUD</h1></a>
             <ul id="nav-mobile" class="right">
                 <li><a href="movies.html">Movies</a></li>
                 <li><a href="create.html">Add</a></li>
@@ -26,11 +26,8 @@
     <main>
         <div class="alertHolder createHolder"></div>
         <div class="row">
-            <div class="col s12 m4">
-                <div class="posterHolder"></div>
-            </div>
-    
             <div class="col s12 m8">
+                <h3>Add a movie</h3>
                 <form class="newMovieForm">
                     <input type="text" id="movieTitle" name="title" required>
                     <label for="movieTitle">Title</label>
@@ -61,6 +58,9 @@
                     <button type="submit" class="submit btn-small waves-effect">submit</button>
                     <a href="movies.html"><button type="button" class="btn-small waves-effect">cancel</button></a>
                 </form>
+            </div>
+            <div class="col s12 m4">
+                <div class="posterHolder"></div>
             </div>
             </div>
     </main>

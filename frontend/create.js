@@ -1,35 +1,23 @@
 const server = require('./server-calls')
-const movies = require('./movies')
 const {newAlert} = require('./utils')
 
+///////////////////////////////////////////////////////////////////////////////
+//      Star Range JS
+///////////////////////////////////////////////////////////////////////////////
 function changeStars(){
     const rating = Number(document.querySelector('#movieRating').value)
-    const stars = document.querySelectorAll('.material-icons')
-
+    const stars = document.querySelectorAll('.ratingBox .material-icons')
     for (let i = 0; i < 5; i++) {
-        if (i <= Math.floor(rating) - 1) {
-            stars[i].textContent = 'star'
-            continue
-        }
+        if (i <= Math.floor(rating) - 1) stars[i].textContent = 'star'
         else stars[i].textContent = 'star_border'
     }
-
     if (rating % 1 !== 0) stars[Math.ceil(rating) - 1].textContent = 'star_half'
 }
 
-// document.querySelector('#movieRating').addEventListener('focus', highlightStars)
-// document.querySelector('#movieRating').addEventListener('focusout', unhighlightStars)
-
-function highlightStars(){
+function changeStarColor(color){
     let stars = document.querySelectorAll('.ratingBox i')
-    stars.forEach(star => star.style.color = '#4db6ac ')
-    document.querySelector('.ratingBox label').style.color = '#4db6ac '
-}
-
-function unhighlightStars(){
-    let stars = document.querySelectorAll('.ratingBox i')
-    stars.forEach(star => star.style.color = '#111')
-    document.querySelector('.ratingBox label').style.color = '#111'
+    stars.forEach(star => star.style.color = color)
+    document.querySelector('.ratingBox label').style.color = color    
 }
 
 function displayPoster(e){
@@ -46,7 +34,7 @@ function createMovie(e){
     let postBody = createPostBody()
     server.createMovie(postBody)
         .then(data => {
-            newAlert(data.data.data[0].title, 'creation')
+            newAlert(data.data.data[0].title, 'creation', 'created')
             clearForm()
         })
 
@@ -69,6 +57,5 @@ function clearForm(){
     inputs.forEach( input => input.value = '')
     document.querySelector('.posterHolder').style.backgroundImage = ''
 }
-//duplicate for 'touchmove'
 
-module.exports = {changeStars, displayPoster, createMovie, createPostBody, changeStars, highlightStars, unhighlightStars, displayPoster}
+module.exports = {changeStars, displayPoster, createMovie, createPostBody, changeStars, changeStarColor, displayPoster}

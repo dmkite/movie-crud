@@ -6,7 +6,7 @@
 }
 
 .posterPage{
-    margin:0;
+    margin-top:75px;
     padding:0;
     background-color:#111;
 }
@@ -14,8 +14,6 @@
 .card-wrapper {
   width: 20%;
   padding-bottom:30%;
-  max-width: 200px;
-  max-height: 350px;
   position: relative;
   -o-perspective: 900px;
   -webkit-perspective: 900px;
@@ -86,8 +84,8 @@ h2{
     display:inline-block;
     outline:3px solid white;
     padding:10px;
-    margin-top:25vh;
-    width: 75vh;
+    margin-top:25%;
+    width: 75%;
     color:white;
 }
  h2 a{
@@ -104,7 +102,8 @@ h1{
     
 }
 nav{
-    position:relative;
+    position:fixed;
+    top:0;
     z-index:9999;
     min-height:75px;
 }
@@ -188,6 +187,7 @@ nav i{
     margin:0 auto;
     background-size: 100%;
     background-repeat: no-repeat;
+    background-image:url('https://place-hold.it/300x500/666/fff/000.gif')
     
 }
 
@@ -195,7 +195,7 @@ body{
     overflow-x:hidden;
 }
 main{
-    padding-top:20px;
+    padding-top:120px;
 }
 
 .editPage{
@@ -206,8 +206,14 @@ main{
     animation: popIn .5s ease-out;
     margin:0 auto;
     width:100%;
-    height:100%;
+    height:100vh;
     padding-top:50px;
+    overflow-y: scroll
+}
+
+.newMovieForm button{
+    margin-top:20px;
+    margin-right:20px;
 }
 
 @keyframes popIn{
@@ -230,13 +236,22 @@ footer{
     text-align:center;
     line-height: 50px;
 }
-@media screen and (max-width:600px){
-    .create{
-        position:fixed;
-        bottom:70px;
-        right:20px;
+@media screen and (max-width:768px){
+    .posterHolder{
+        width:200px;
+        height: 333px
     }
 }
+
+@media screen and (max-width:600px){
+    .create{display:none}
+    nav{position:fixed; top:0;}
+    main{padding-top:100px;}
+    .posterHolder{margin-top:20px;
+    width:100%;
+    padding-bottom:250%;}
+}
+
 @media screen and (max-width: 420px){
     .container{
         margin:0;
@@ -247,5 +262,12 @@ footer{
     }
     .edit i, .delete i{
         margin-left:-7px;
+    }
+}
+
+@media screen and (min-width:651px){
+    .card-wrapper{
+        width: 12.5%;
+        padding-bottom:18%;
     }
 }
