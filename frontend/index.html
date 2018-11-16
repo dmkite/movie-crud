@@ -9,13 +9,22 @@
     <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
     <script defer src="bundle.js"></script>
 </head>
-<body>
+<body id="index">
     <header>
         <!-- <h1><span>C</span>inema <span>R</span>eviewer's <span>U</span>nion of <span>D</span>etroit</h1> -->
-        <nav>
-            <a href="movies.html">Movies</a>
+        <nav class="nav-wrapper">
+            <h1 class="brand-logo left">CRUD</h1>
+            <ul id="nav-mobile" class="hide-on-med-and-down right">
+                <li><a href="movies.html">Movies</a></li>
+                <li><a href="create.html">Add</a></li>
+            </ul>
+            
         </nav>
     </header>
-    
+    <article class="posterPage">
+    </article>
+    <main class="mainPage">
+        <h2>Your go to hub for complaining about movies</h2>
+    </main>
 </body>
 </html>

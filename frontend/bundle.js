@@ -1,5 +1,7 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 const server = require('./server-calls')
+const movies = require('./movies')
+const {newAlert} = require('./utils')
 
 function changeStars(){
     const rating = Number(document.querySelector('#movieRating').value)
@@ -16,8 +18,8 @@ function changeStars(){
     if (rating % 1 !== 0) stars[Math.ceil(rating) - 1].textContent = 'star_half'
 }
 
-document.querySelector('#movieRating').addEventListener('focus', highlightStars)
-document.querySelector('#movieRating').addEventListener('focusout', unhighlightStars)
+// document.querySelector('#movieRating').addEventListener('focus', highlightStars)
+// document.querySelector('#movieRating').addEventListener('focusout', unhighlightStars)
 
 function highlightStars(){
     let stars = document.querySelectorAll('.ratingBox i')
@@ -45,7 +47,7 @@ function createMovie(e){
     let postBody = createPostBody()
     server.createMovie(postBody)
         .then(data => {
-            creationAlert(data.data.data[0].title)
+            newAlert(data.data.data[0].title, 'creation')
             clearForm()
         })
 
@@ -58,22 +60,10 @@ function createPostBody(){
         acc[input.name] = input.value
         return acc
     }, {})
+
     return postBody
 }
 
-function creationAlert(title) {
-    let newAlert = `
-    <p class="creationAlert">${title} has been added</p>`
-    document.querySelector('body').innerHTML += newAlert
-    setTimeout(
-        function () {
-            document.querySelector('.creationAlert').classList.add('fadeOut')
-            setTimeout(
-                function () { document.querySelector('.creationAlert').remove() },
-                1000
-            )
-        }, 3000)
-}
 
 function clearForm(){
     inputs = document.querySelectorAll('.newMovieForm inputs')
@@ -82,12 +72,45 @@ function clearForm(){
 }
 //duplicate for 'touchmove'
 
-module.exports = {changeStars, displayPoster, createMovie}
-},{"./server-calls":31}],2:[function(require,module,exports){
+module.exports = {changeStars, displayPoster, createMovie, createPostBody, changeStars, highlightStars, unhighlightStars, displayPoster}
+},{"./movies":3,"./server-calls":32,"./utils":33}],2:[function(require,module,exports){
 const movies = require('./movies')
 const create = require('./create')
-
+const posters = require('./posters')
 // console.log(window.location.href)
+if (window.location.href.endsWith('/index.html')){
+    
+    HTMLPosters = posters.reduce( (acc, poster) => {
+        let rand = (Math.floor(Math.random() * posters.length))
+        acc.push(`<div class="card-wrapper">
+            <div class="card">
+                <div class="card-front" style="background-image:url('${poster}')"></div>
+                <div class="card-back" style="background-image:url('${posters[rand]}')"></div>
+            </div>
+        </div>`)
+        return acc
+    }, [])
+    
+    console.log(HTMLPosters)
+    document.querySelector('.posterPage').innerHTML = HTMLPosters.join('')
+
+    const flipping = setInterval(
+        function(){
+            const cards = document.querySelectorAll('.card')
+            let rand =  Math.floor(Math.random() * 15) + 15
+            console.log(rand)
+            cards[rand].classList.toggle('do-flip')
+        }, 1500)
+
+    const flipping2 = setInterval(
+        function () {
+            const cards = document.querySelectorAll('.card')
+            let rand = Math.floor(Math.random() * cards.length)
+            console.log(rand)
+            cards[rand].classList.toggle('do-flip')
+        }, 3333)
+}
+
 if (window.location.href.endsWith('/movies.html')) document.addEventListener('DOMContentLoaded', movies.addToTable)
 
 if (window.location.href.endsWith('/create.html')){ 
@@ -97,21 +120,26 @@ if (window.location.href.endsWith('/create.html')){
     document.querySelector('#movieRating').addEventListener('touchmove', create.changeStars)
     document.querySelector('#posterURL').addEventListener('change', function (e) { create.displayPoster(e) })
     document.querySelector('.newMovieForm').addEventListener('submit', function(e){create.createMovie(e)})
+    document.querySelector('#movieRating').addEventListener('focus', create.highlightStars)
+    document.querySelector('#movieRating').addEventListener('focusout', create.unhighlightStars)
 }
-},{"./create":1,"./movies":3}],3:[function(require,module,exports){
+},{"./create":1,"./movies":3,"./posters":31}],3:[function(require,module,exports){
 const server = require('./server-calls')
-const { addListener } = require('./utils')
+const create = require('./create')
+const { addListener, newAlert } = require('./utils')
 
 ///////////////////////////////////////////////////////////////////////////////
 //      Initial Setup
 //////////////////////////////////////////////////////////////////////////////
 
 function addToTable(){
-    server.getAll()
+   return server.getAll()
         .then(data => {
             let htmlArray = HTMLify(data.data.data)
+            document.querySelector('.movieTable').innerHTML = ''
             document.querySelector('.movieTable').innerHTML += htmlArray.join('')
-            addListener('.delete', 'click', deleteMovie)
+            addListener('.delete', 'click', function(e){deleteMovie(e)})
+            addListener('.edit', 'click', function(e){createEditPage(e)})
         }) 
 }
 
@@ -132,10 +160,10 @@ function tablify(item){
         <td>${item.year}</td>
         <td>${item.rating}</td>
         <td>
-            <button class="edit btn-small waves-effect">edit</button>
+            <button type="button" class="edit btn-small waves-effect">edit</button>
         </td>
         <td>
-            <button class="delete btn-small waves-effect">delete</button>
+            <button type="button" class="delete btn-small waves-effect">delete</button>
         </td>
     </tr>`
 }
@@ -144,33 +172,123 @@ function tablify(item){
 ///////////////////////////////////////////////////////////////////////////////
 //      Delete Movie
 ///////////////////////////////////////////////////////////////////////////////
+
 function deleteMovie(e){
-    e.preventDefault()
+    console.log('firing')
+    // e.preventDefault()
     const id = e.target.parentElement.parentElement.id
     server.deleteMovie(id)
         .then(data => {
-            deletionAlert(data.data.data[0].title)
+            newAlert(data.data.data[0].title, 'deletion')
             document.querySelector('.movieTable').innerHTML = ''
             return addToTable()
         })
 }
 
-function deletionAlert(title){
-    let newAlert = `
-    <p class="alert">${title} has been deleted</p>`
-    document.querySelector('body').innerHTML += newAlert
-    setTimeout( 
-        function(){
-            document.querySelector('.alert').classList.add('fadeOut')
-            setTimeout(
-                function(){ document.querySelector('.alert').remove()},
-                1000
-            )
-        }, 3000)
+
+///////////////////////////////////////////////////////////////////////////////
+//      Edit Movie
+///////////////////////////////////////////////////////////////////////////////
+
+function createEditPage(e){
+    console.log('firing too')
+    const id = e.target.parentElement.parentElement.id
+    server.getOne(id)
+    .then(data => {
+        document.querySelector('body').innerHTML += createEditHTML(data.data.data[0])
+        document.querySelector('.cancel').addEventListener('click', function(e){minimize(e)})
+        document.querySelector('.confirm').addEventListener('click', function(e){submitChanges(e)})
+        addWatchers()
+    })
+    
+    
 }
 
-module.exports = {addToTable}
-},{"./server-calls":31,"./utils":32}],4:[function(require,module,exports){
+function addWatchers(){
+    document.querySelector('#movieRating').addEventListener('mousemove', create.changeStars)
+    document.querySelector('#movieRating').addEventListener('keydown', create.changeStars)
+    document.querySelector('#movieRating').addEventListener('keyup', create.changeStars)
+    document.querySelector('#movieRating').addEventListener('touchmove', create.changeStars)
+    document.querySelector('#posterURL').addEventListener('change', function (e) { create.displayPoster(e) })
+    document.querySelector('#movieRating').addEventListener('focus', create.highlightStars)
+    document.querySelector('#movieRating').addEventListener('focusout', create.unhighlightStars)
+}
+
+function createEditHTML(movieInfo){
+    return `
+    <div class="editPage">
+        <div class="row">
+            <div class="col s1 m6">
+                <div class="posterHolder" style="background-image:url('${movieInfo.poster_url}')"></div>
+            </div>
+
+            <div class="col s1 m6">
+                <form class="newMovieForm">
+                    <input type="text" id="movieTitle" name="title" required value="${movieInfo.title}">
+                    <label for="movieTitle">Title</label>
+
+                    <input type="text" id="movieDirector" name="director" required value="${movieInfo.director}">
+                    <label for="movieDirector">Director</label>
+
+                    <input type="text" id="movieYear" name="year" required pattern="[0-9]{4}" value="${movieInfo.year}">
+                    <label for="movieYear">Year</label>
+
+
+                    <div class="ratingBox">
+                        <span class="stars">
+                            <i class="material-icons">star</i>
+                            <i class="material-icons">star</i>
+                            <i class="material-icons">star</i>
+                            <i class="material-icons">star_border</i>
+                            <i class="material-icons">star_border</i>
+                        </span>
+                        <!-- <i class="material-icons">star_half</i>
+                        <i class="material-icons">star</i> -->
+                        <input id="movieRating" name="rating" type="range" min="1" max="5" step="0.5" value="${movieInfo.rating}">
+                        <label for="movieRating">Rating</label>
+                    </div>
+
+
+                    <input type="url" id="posterURL" name="poster_url" required value="${movieInfo.poster_url}">
+                    <label for="posterURL">Movie Poster URL</label>
+                    <br>
+                    <button type="button" id="${movieInfo.id}" class="confirm btn-small waves-effect">confirm</button>
+                    <button type="button" class="cancel btn-small waves-effect">cancel</button>
+                </form>
+            </div>
+    </div>`
+}
+
+function minimize(e){
+    const editPage = document.querySelector('.editPage')
+    setTimeout( function(){ 
+        editPage.style.animation = 'popOut .3s ease-in'
+        addToTable()
+        setTimeout(function(){
+            editPage.remove()
+        }, 300)
+    },0)
+}
+
+function submitChanges(e){
+    const id = Number(e.target.id)
+    
+    let putBody = create.createPostBody()
+    server.editMovie(id, putBody)
+    .then(() =>{
+        addToTable()
+        .then(() => {
+            minimize(e)
+        })    
+    })
+    
+}
+
+
+
+
+module.exports = {addToTable, newAlert}
+},{"./create":1,"./server-calls":32,"./utils":33}],4:[function(require,module,exports){
 module.exports = require('./lib/axios');
 },{"./lib/axios":6}],5:[function(require,module,exports){
 (function (process){
@@ -1802,6 +1920,45 @@ process.chdir = function (dir) {
 process.umask = function() { return 0; };
 
 },{}],31:[function(require,module,exports){
+const posters = 
+['https://image.tmdb.org/t/p/w185_and_h278_bestv2/lHu1wtNaczFPGFDTrjCSzeLPTKN.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/x1txcDXkcM65gl7w20PwYSxAYah.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/AkJQpZp9WoNdj7pLYSj1L0RcMMN.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/7WsyChQLEftFiDOVTGkv3hFpyyt.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/eyWICPcxOuTcDDDbTMOZawoOn8d.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/rWQVj6Z8kPdsbt7XPjVBCltxq90.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/wrFpXMNBRj2PBiN4Z5kix51XaIZ.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/rv1AWImgx386ULjcf62VYaW8zSt.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/rW0A73hjzPWVwADlCTLnjLhAFLX.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/2L8ehd95eSW9x7KINYtZmRkAlrZ.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/afdZAIcAQscziqVtsEoh2PwsYTW.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/pk9R56ZFlofbBzfwBnHlDyg5DMs.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/5LYSsOPzuP13201qSzMjNxi8FxN.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/gnTqi4nhIi1eesT5uYMmhEPGNih.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/uxzzxijgPIY7slzFvMotPv8wjKA.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/l76Rgp32z2UxjULApxGXAPpYdAP.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/bXs0zkv2iGVViZEy78teg2ycDBm.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/to0spRl1CMDvyUbOnbb4fTk3VAd.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/rT49ousKUWN3dV7UlhaC9onTNdl.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/9qYKrgzHbYtKej9Gvd7NxJvGiC2.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/x2I7eZNMDZKPUFM6QuKkmHKZDQm.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/sFC1ElvoKGdHJIWRpNB3xWJ9lJA.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/MvYpKlpFukTivnlBhizGbkAe3v.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/w4ibr8R702DCjwYniry1D1XwQXj.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/c9XxwwhPHdaImA2f1WEfEsbhaFB.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/litjsBoiydO6JlO70uOX4N3WnNL.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/3IGbjc5ZC5yxim5W0sFING2kdcz.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/v2KnosS7G2M9pMymvX0XXTcf04c.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/i91mfvFcPPlaegcbOyjGgiWfZzh.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/msqWSQkU403cQKjQHnWLnugv7EY.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/pU1ULUq8D3iRxl1fdX2lZIzdHuI.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/55W6mUVv4CXMMQHHhV2zXtLSpXQ.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/dOtenLPIbTUZ8dcYKEA7T7qRURz.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/gjAFM4xhA5vyLxxKMz38ujlUfDL.jpg',
+'https://image.tmdb.org/t/p/w185_and_h278_bestv2/qcnOKCPleLOTWPPgYI0YT1MOQwR.jpg']
+
+module.exports = posters
+},{}],32:[function(require,module,exports){
 const axios = require('axios')
 const baseURL = 'http://localhost:3000/movies'
 
@@ -1810,6 +1967,13 @@ function getAll() {
         .then(result => {
             return result
         })
+}
+
+function getOne(id){
+    return axios.get(baseURL + '/' + id)
+        .then(result => {
+            return result
+        }) 
 }
 
 function deleteMovie(id){
@@ -1823,14 +1987,42 @@ function createMovie(postBody){
     return axios.post(baseURL, postBody)
 }
 
-module.exports = {getAll, deleteMovie, createMovie}
-},{"axios":4}],32:[function(require,module,exports){
+function editMovie(id, putBody){
+    return axios.put(baseURL + '/' + id, putBody)
+}
+
+
+module.exports = {getAll, getOne, deleteMovie, createMovie, editMovie}
+},{"axios":4}],33:[function(require,module,exports){
 function addListener(iterable, trigger, fn){
     let iterables = document.querySelectorAll(iterable)
     iterables.forEach(iter => {
-        iter.addEventListener(trigger, function(e){fn(e)})
+        // return iter.addEventListener(trigger, function(e){fn(e)})
+        iter.onclick = function(e){fn(e)}
+
+    })
+    console.log(iterables, '***********************************************')
+}
+
+function addMultipleListeners(element, triggerArray, fn){
+    triggerArray.forEach( trigger => {
+        document.querySelector(element).addEventListener(trigger, fn)
     })
 }
 
-module.exports = {addListener}
+function newAlert(title, type) {
+    let newAlert = `
+    <p class="${type}Alert">${title} has been added</p>`
+    document.querySelector('.alertHolder').innerHTML += newAlert
+    setTimeout(
+        function () {
+            document.querySelector(`.${type}Alert`).classList.add('fadeOut')
+            setTimeout(
+                function () { document.querySelector(`.${type}Alert`).remove() },
+                1000
+            )
+        }, 3000)
+}
+
+module.exports = {addListener, newAlert}
 },{}]},{},[2]);

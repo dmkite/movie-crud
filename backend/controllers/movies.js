@@ -15,7 +15,7 @@ function getAllMovies(req, res, next){
 }
 
 function getOneMovie(req, res, next) {
-    const id = req.params.id
+    const id = Number(req.params.id)
     return model.getOneMovie(id)
         .then(result => {
             if(!result.length) return next({status:404, message:'The movie you\'re looking for isn\'t here'})
@@ -39,7 +39,7 @@ function createMovie(req, res, next){
 }
 
 function editMovie(req, res, next){
-    const id = req.params.id
+    const id = Number(req.params.id)
     return model.editMovie(id, req.body)
         .then(result => {
             if (!result) return next({ status: 404, message: 'The movie you\'re looking for isn\'t here' })
@@ -51,7 +51,7 @@ function editMovie(req, res, next){
 }
 
 function deleteMovie(req, res, next){
-    const id = req.params.id
+    const id = Number(req.params.id)
     return model.deleteMovie(id)
         .then(result => {
             if (!result) return next({ status: 404, message: 'The movie you\'re looking for isn\'t here' })

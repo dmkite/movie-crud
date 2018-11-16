@@ -8,6 +8,13 @@ function getAll() {
         })
 }
 
+function getOne(id){
+    return axios.get(baseURL + '/' + id)
+        .then(result => {
+            return result
+        }) 
+}
+
 function deleteMovie(id){
     return axios.delete(`${baseURL}/${id}`)
         .then(result => {
@@ -19,4 +26,9 @@ function createMovie(postBody){
     return axios.post(baseURL, postBody)
 }
 
-module.exports = {getAll, deleteMovie, createMovie}
+function editMovie(id, putBody){
+    return axios.put(baseURL + '/' + id, putBody)
+}
+
+
+module.exports = {getAll, getOne, deleteMovie, createMovie, editMovie}

@@ -20,12 +20,13 @@
         </nav>
     </header>
     <main>
+        <div class="alertHolder createHolder"></div>
         <div class="row">
-            <div class="col s1 m6">
+            <div class="col s12 m6">
                 <div class="posterHolder"></div>
             </div>
     
-            <div class="col s1 m6">
+            <div class="col s12 m6">
                 <form class="newMovieForm">
                     <input type="text" id="movieTitle" name="title" required>
                     <label for="movieTitle">Title</label>
@@ -45,8 +46,6 @@
                             <i class="material-icons">star_border</i>
                             <i class="material-icons">star_border</i>
                         </span>
-                        <!-- <i class="material-icons">star_half</i>
-                        <i class="material-icons">star</i> -->
                         <input id="movieRating" name="rating" type="range" min="1" max="5" step="0.5">
                         <label for="movieRating">Rating</label>
                     </div>
@@ -56,6 +55,7 @@
                     <label for="posterURL">Movie Poster URL</label>
                     <br>
                     <button type="submit" class="submit btn-small waves-effect">submit</button>
+                    <a href="movies.html"><button type="button" class="btn-small waves-effect">cancel</button></a>
                 </form>
             </div>
             </div>

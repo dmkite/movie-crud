@@ -1,12 +1,112 @@
-.alert, .creationAlert{
+.posterPage{
+    margin:0;
+    padding:0;
+    background-color:#111;
+}
+
+.card-wrapper {
+  width: 20%;
+  padding-bottom:30%;
+  max-width: 200px;
+  max-height: 350px;
+  position: relative;
+  -o-perspective: 900px;
+  -webkit-perspective: 900px;
+  -ms-perspective: 900px;
+  perspective: 900px;
+  display:inline-block;
+}
+
+.card {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    -o-transition: all 1s ease-in-out;
+    -webkit-transition: all 1s ease-in-out;
+    -ms-transition: all 1s ease-in-out;
+    transition: all 1s ease-in-out;
+    -o-transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    -ms-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+}
+
+.do-flip {
+    -o-transform: rotateY(-180deg);
+    -webkit-transform: rotateY(-180deg);
+    -ms-transform: rotateY(-180deg);
+    transform: rotateY(-180deg);
+}
+
+.card .card-front, .card .card-back{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    -o-backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    -ms-backface-visibility: hidden;
+    backface-visibility: hidden;
+    z-index: 2;
+    background-size:100%;
+}
+
+.card .card-front {
+    overflow:hidden;
+}
+
+.card .card-back {
+    background-size:100%;
+    -o-transform: rotateY(180deg);
+    -webkit-transform: rotateY(180deg);
+    -ms-transform: rotateY(180deg);
+    transform: rotateY(180deg);
+
+}
+
+.mainPage{
+    position:fixed;
+    top:0;
+    left:0;
+    background: radial-gradient(#00000090, #000000ff);
+    width:100vh;
+    height:100vh;
+    margin-top: 60px;
+    text-align:center;
+    color:white;
+}
+
+h2{
+    display:inline-block;
+    outline:3px solid white;
+    padding:10px;
+    margin-top:25vh;
+    width: 75vh;
+}
+
+#index{
+    height:100vh;
+    overflow:none;
+    position:fixed;
+    width:100vh;
+}
+
+h1{
+    font-size: 24px;
+    outline:1px dotted white;
+}
+nav{
+    position:relative;
+    z-index:9999;
+    min-height:75px;
+}
+/**********************************************************/
+.deletionAlert, .creationAlert{
     background-color: #fce4ec;
     border:2px solid #d81b60;
     color: #d81b60;
-    position:absolute;
     animation: slideout 1s ease-out;
     width:250px;
-    right:0;
-    top:0;
+    
 }
 
 .creationAlert{
@@ -15,9 +115,17 @@
     border-color:#00695c;
 }
 
+
+.createHolder{
+    float:right;
+    height:50px;
+    width:250px;
+    padding:0;
+}
+
 @keyframes slideout{
-    0%{right:-300px; top:0;}
-    100%{right:0; top: 0;}
+    0%{margin-left:300px;}
+    100%{margin-left:0;}
 }
 .fadeOut{
     animation: fadeOut 1s ease-in;
@@ -65,3 +173,26 @@ body{
 main{
     padding-top:20px;
 }
+
+.editPage{
+    position:fixed;
+    top:70px;
+    background-color:white;
+    z-index:999;
+    animation: popIn .5s ease-out;
+    margin:0 auto;
+    width:100%;
+    height:100%;
+    padding-top:50px;
+}
+
+@keyframes popIn{
+    0%{transform:scale(0)}
+    100%{transform:scale(1)}
+}
+
+@keyframes popOut{
+    0%{transform:scale(1)}
+    100%{transform:scale(0)}
+}
+

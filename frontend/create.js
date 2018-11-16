@@ -1,4 +1,6 @@
 const server = require('./server-calls')
+const movies = require('./movies')
+const {newAlert} = require('./utils')
 
 function changeStars(){
     const rating = Number(document.querySelector('#movieRating').value)
@@ -15,8 +17,8 @@ function changeStars(){
     if (rating % 1 !== 0) stars[Math.ceil(rating) - 1].textContent = 'star_half'
 }
 
-document.querySelector('#movieRating').addEventListener('focus', highlightStars)
-document.querySelector('#movieRating').addEventListener('focusout', unhighlightStars)
+// document.querySelector('#movieRating').addEventListener('focus', highlightStars)
+// document.querySelector('#movieRating').addEventListener('focusout', unhighlightStars)
 
 function highlightStars(){
     let stars = document.querySelectorAll('.ratingBox i')
@@ -44,7 +46,7 @@ function createMovie(e){
     let postBody = createPostBody()
     server.createMovie(postBody)
         .then(data => {
-            creationAlert(data.data.data[0].title)
+            newAlert(data.data.data[0].title, 'creation')
             clearForm()
         })
 
@@ -57,22 +59,10 @@ function createPostBody(){
         acc[input.name] = input.value
         return acc
     }, {})
+
     return postBody
 }
 
-function creationAlert(title) {
-    let newAlert = `
-    <p class="creationAlert">${title} has been added</p>`
-    document.querySelector('body').innerHTML += newAlert
-    setTimeout(
-        function () {
-            document.querySelector('.creationAlert').classList.add('fadeOut')
-            setTimeout(
-                function () { document.querySelector('.creationAlert').remove() },
-                1000
-            )
-        }, 3000)
-}
 
 function clearForm(){
     inputs = document.querySelectorAll('.newMovieForm inputs')
@@ -81,4 +71,4 @@ function clearForm(){
 }
 //duplicate for 'touchmove'
 
-module.exports = {changeStars, displayPoster, createMovie}
+module.exports = {changeStars, displayPoster, createMovie, createPostBody, changeStars, highlightStars, unhighlightStars, displayPoster}
