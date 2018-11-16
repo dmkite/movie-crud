@@ -1,3 +1,10 @@
+#index{
+    height:100vh;
+    overflow:none;
+    position:fixed;
+    width:100%;
+}
+
 .posterPage{
     margin:0;
     padding:0;
@@ -68,7 +75,7 @@
     top:0;
     left:0;
     background: radial-gradient(#00000090, #000000ff);
-    width:100vh;
+    width:100%;
     height:100vh;
     margin-top: 60px;
     text-align:center;
@@ -81,23 +88,38 @@ h2{
     padding:10px;
     margin-top:25vh;
     width: 75vh;
+    color:white;
 }
+ h2 a{
+     color:white;
+ }
 
-#index{
-    height:100vh;
-    overflow:none;
-    position:fixed;
-    width:100vh;
-}
+
 
 h1{
     font-size: 24px;
-    outline:1px dotted white;
+    margin-top:0;
+    display:inline-block;
+    padding:10px;
+    
 }
 nav{
     position:relative;
     z-index:9999;
     min-height:75px;
+}
+
+nav i{
+    font-size:72px;
+    display:inline-block;
+    border:2px solid white;
+    width:50px !important;
+    height:50px !important;
+    line-height:50px;
+    /* margin:0 !important; padding:0 !important; */
+    border-radius:50%;
+    line-height:50px;
+    text-align:center;
 }
 /**********************************************************/
 .deletionAlert, .creationAlert{
@@ -163,10 +185,12 @@ nav{
 .posterHolder{
     height:500px;
     width:300px;
-    border:1px solid #d81b60;
     margin:0 auto;
-    background-size: 100%
+    background-size: 100%;
+    background-repeat: no-repeat;
+    
 }
+
 body{
     overflow-x:hidden;
 }
@@ -196,3 +220,32 @@ main{
     100%{transform:scale(0)}
 }
 
+footer{
+    background-color:#94877A;
+    position:absolute;
+    bottom:0;
+    min-height:50px;
+    width:100%;
+    color:white;
+    text-align:center;
+    line-height: 50px;
+}
+@media screen and (max-width:600px){
+    .create{
+        position:fixed;
+        bottom:70px;
+        right:20px;
+    }
+}
+@media screen and (max-width: 420px){
+    .container{
+        margin:0;
+    }
+    .edit, .delete{
+        width:25px;
+        text-align:center;
+    }
+    .edit i, .delete i{
+        margin-left:-7px;
+    }
+}

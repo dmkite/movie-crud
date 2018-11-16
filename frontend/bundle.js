@@ -73,32 +73,30 @@ function clearForm(){
 //duplicate for 'touchmove'
 
 module.exports = {changeStars, displayPoster, createMovie, createPostBody, changeStars, highlightStars, unhighlightStars, displayPoster}
-},{"./movies":3,"./server-calls":32,"./utils":33}],2:[function(require,module,exports){
+},{"./movies":3,"./server-calls":31,"./utils":32}],2:[function(require,module,exports){
 const movies = require('./movies')
 const create = require('./create')
-const posters = require('./posters')
-// console.log(window.location.href)
-if (window.location.href.endsWith('/index.html')){
+const {posters, posterBacks, addMultipleListeners, mediaQuery, windowSize} = require('./utils')
+
+if (!!document.querySelector('.posterPage')){
     
     HTMLPosters = posters.reduce( (acc, poster) => {
-        let rand = (Math.floor(Math.random() * posters.length))
+        let rand = (Math.floor(Math.random() * posterBacks.length))
         acc.push(`<div class="card-wrapper">
             <div class="card">
                 <div class="card-front" style="background-image:url('${poster}')"></div>
-                <div class="card-back" style="background-image:url('${posters[rand]}')"></div>
+                <div class="card-back" style="background-image:url('${posterBacks[rand]}')"></div>
             </div>
         </div>`)
         return acc
     }, [])
     
-    console.log(HTMLPosters)
     document.querySelector('.posterPage').innerHTML = HTMLPosters.join('')
 
     const flipping = setInterval(
         function(){
             const cards = document.querySelectorAll('.card')
-            let rand =  Math.floor(Math.random() * 15) + 15
-            console.log(rand)
+            let rand =  Math.floor(Math.random() * cards.length)
             cards[rand].classList.toggle('do-flip')
         }, 1500)
 
@@ -106,24 +104,25 @@ if (window.location.href.endsWith('/index.html')){
         function () {
             const cards = document.querySelectorAll('.card')
             let rand = Math.floor(Math.random() * cards.length)
-            console.log(rand)
             cards[rand].classList.toggle('do-flip')
         }, 3333)
 }
 
-if (window.location.href.endsWith('/movies.html')) document.addEventListener('DOMContentLoaded', movies.addToTable)
+if (window.location.href.endsWith('/movies.html')){
+    document.addEventListener('DOMContentLoaded', movies.addToTable)
+    document.addEventListener('DOMContentLoaded', mediaQuery)
+    windowSize.addListener(mediaQuery)
+
+} 
 
 if (window.location.href.endsWith('/create.html')){ 
-    document.querySelector('#movieRating').addEventListener('mousemove', create.changeStars)
-    document.querySelector('#movieRating').addEventListener('keydown', create.changeStars)
-    document.querySelector('#movieRating').addEventListener('keyup', create.changeStars)
-    document.querySelector('#movieRating').addEventListener('touchmove', create.changeStars)
+    addMultipleListeners('#movieRating', ['mousemove', 'keydown', 'keyup', 'touchmove'], create.changeStars)
     document.querySelector('#posterURL').addEventListener('change', function (e) { create.displayPoster(e) })
     document.querySelector('.newMovieForm').addEventListener('submit', function(e){create.createMovie(e)})
     document.querySelector('#movieRating').addEventListener('focus', create.highlightStars)
     document.querySelector('#movieRating').addEventListener('focusout', create.unhighlightStars)
 }
-},{"./create":1,"./movies":3,"./posters":31}],3:[function(require,module,exports){
+},{"./create":1,"./movies":3,"./utils":32}],3:[function(require,module,exports){
 const server = require('./server-calls')
 const create = require('./create')
 const { addListener, newAlert } = require('./utils')
@@ -288,7 +287,7 @@ function submitChanges(e){
 
 
 module.exports = {addToTable, newAlert}
-},{"./create":1,"./server-calls":32,"./utils":33}],4:[function(require,module,exports){
+},{"./create":1,"./server-calls":31,"./utils":32}],4:[function(require,module,exports){
 module.exports = require('./lib/axios');
 },{"./lib/axios":6}],5:[function(require,module,exports){
 (function (process){
@@ -1920,45 +1919,6 @@ process.chdir = function (dir) {
 process.umask = function() { return 0; };
 
 },{}],31:[function(require,module,exports){
-const posters = 
-['https://image.tmdb.org/t/p/w185_and_h278_bestv2/lHu1wtNaczFPGFDTrjCSzeLPTKN.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/x1txcDXkcM65gl7w20PwYSxAYah.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/AkJQpZp9WoNdj7pLYSj1L0RcMMN.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/7WsyChQLEftFiDOVTGkv3hFpyyt.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/eyWICPcxOuTcDDDbTMOZawoOn8d.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/rWQVj6Z8kPdsbt7XPjVBCltxq90.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/wrFpXMNBRj2PBiN4Z5kix51XaIZ.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/rv1AWImgx386ULjcf62VYaW8zSt.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/rW0A73hjzPWVwADlCTLnjLhAFLX.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/2L8ehd95eSW9x7KINYtZmRkAlrZ.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/afdZAIcAQscziqVtsEoh2PwsYTW.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/pk9R56ZFlofbBzfwBnHlDyg5DMs.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/5LYSsOPzuP13201qSzMjNxi8FxN.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/gnTqi4nhIi1eesT5uYMmhEPGNih.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/uxzzxijgPIY7slzFvMotPv8wjKA.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/l76Rgp32z2UxjULApxGXAPpYdAP.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/bXs0zkv2iGVViZEy78teg2ycDBm.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/to0spRl1CMDvyUbOnbb4fTk3VAd.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/rT49ousKUWN3dV7UlhaC9onTNdl.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/9qYKrgzHbYtKej9Gvd7NxJvGiC2.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/x2I7eZNMDZKPUFM6QuKkmHKZDQm.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/sFC1ElvoKGdHJIWRpNB3xWJ9lJA.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/MvYpKlpFukTivnlBhizGbkAe3v.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/w4ibr8R702DCjwYniry1D1XwQXj.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/c9XxwwhPHdaImA2f1WEfEsbhaFB.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/litjsBoiydO6JlO70uOX4N3WnNL.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/3IGbjc5ZC5yxim5W0sFING2kdcz.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/v2KnosS7G2M9pMymvX0XXTcf04c.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/i91mfvFcPPlaegcbOyjGgiWfZzh.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/msqWSQkU403cQKjQHnWLnugv7EY.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/pU1ULUq8D3iRxl1fdX2lZIzdHuI.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/55W6mUVv4CXMMQHHhV2zXtLSpXQ.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/dOtenLPIbTUZ8dcYKEA7T7qRURz.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/gjAFM4xhA5vyLxxKMz38ujlUfDL.jpg',
-'https://image.tmdb.org/t/p/w185_and_h278_bestv2/qcnOKCPleLOTWPPgYI0YT1MOQwR.jpg']
-
-module.exports = posters
-},{}],32:[function(require,module,exports){
 const axios = require('axios')
 const baseURL = 'http://localhost:3000/movies'
 
@@ -1993,15 +1953,13 @@ function editMovie(id, putBody){
 
 
 module.exports = {getAll, getOne, deleteMovie, createMovie, editMovie}
-},{"axios":4}],33:[function(require,module,exports){
+},{"axios":4}],32:[function(require,module,exports){
 function addListener(iterable, trigger, fn){
     let iterables = document.querySelectorAll(iterable)
     iterables.forEach(iter => {
-        // return iter.addEventListener(trigger, function(e){fn(e)})
-        iter.onclick = function(e){fn(e)}
-
+        return iter.addEventListener(trigger, function(e){fn(e)})
     })
-    console.log(iterables, '***********************************************')
+    
 }
 
 function addMultipleListeners(element, triggerArray, fn){
@@ -2024,5 +1982,62 @@ function newAlert(title, type) {
         }, 3000)
 }
 
-module.exports = {addListener, newAlert}
+const posters =
+    ['https://image.tmdb.org/t/p/w185_and_h278_bestv2/lHu1wtNaczFPGFDTrjCSzeLPTKN.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/x1txcDXkcM65gl7w20PwYSxAYah.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/AkJQpZp9WoNdj7pLYSj1L0RcMMN.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/7WsyChQLEftFiDOVTGkv3hFpyyt.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/eyWICPcxOuTcDDDbTMOZawoOn8d.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/rWQVj6Z8kPdsbt7XPjVBCltxq90.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/wrFpXMNBRj2PBiN4Z5kix51XaIZ.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/rv1AWImgx386ULjcf62VYaW8zSt.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/rW0A73hjzPWVwADlCTLnjLhAFLX.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/2L8ehd95eSW9x7KINYtZmRkAlrZ.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/afdZAIcAQscziqVtsEoh2PwsYTW.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/pk9R56ZFlofbBzfwBnHlDyg5DMs.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/5LYSsOPzuP13201qSzMjNxi8FxN.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/gnTqi4nhIi1eesT5uYMmhEPGNih.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/uxzzxijgPIY7slzFvMotPv8wjKA.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/l76Rgp32z2UxjULApxGXAPpYdAP.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/bXs0zkv2iGVViZEy78teg2ycDBm.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/to0spRl1CMDvyUbOnbb4fTk3VAd.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/rT49ousKUWN3dV7UlhaC9onTNdl.jpg',
+        'https://image.tmdb.org/t/p/w185_and_h278_bestv2/9qYKrgzHbYtKej9Gvd7NxJvGiC2.jpg']
+
+const posterBacks = [
+    'https://image.tmdb.org/t/p/w185_and_h278_bestv2/x2I7eZNMDZKPUFM6QuKkmHKZDQm.jpg',
+    'https://image.tmdb.org/t/p/w185_and_h278_bestv2/sFC1ElvoKGdHJIWRpNB3xWJ9lJA.jpg',
+    'https://image.tmdb.org/t/p/w185_and_h278_bestv2/MvYpKlpFukTivnlBhizGbkAe3v.jpg',
+    'https://image.tmdb.org/t/p/w185_and_h278_bestv2/w4ibr8R702DCjwYniry1D1XwQXj.jpg',
+    'https://image.tmdb.org/t/p/w185_and_h278_bestv2/c9XxwwhPHdaImA2f1WEfEsbhaFB.jpg',
+    'https://image.tmdb.org/t/p/w185_and_h278_bestv2/litjsBoiydO6JlO70uOX4N3WnNL.jpg',
+    'https://image.tmdb.org/t/p/w185_and_h278_bestv2/3IGbjc5ZC5yxim5W0sFING2kdcz.jpg',
+    'https://image.tmdb.org/t/p/w185_and_h278_bestv2/v2KnosS7G2M9pMymvX0XXTcf04c.jpg',
+    'https://image.tmdb.org/t/p/w185_and_h278_bestv2/i91mfvFcPPlaegcbOyjGgiWfZzh.jpg',
+    'https://image.tmdb.org/t/p/w185_and_h278_bestv2/msqWSQkU403cQKjQHnWLnugv7EY.jpg',
+    'https://image.tmdb.org/t/p/w185_and_h278_bestv2/pU1ULUq8D3iRxl1fdX2lZIzdHuI.jpg',
+    'https://image.tmdb.org/t/p/w185_and_h278_bestv2/55W6mUVv4CXMMQHHhV2zXtLSpXQ.jpg',
+    'https://image.tmdb.org/t/p/w185_and_h278_bestv2/dOtenLPIbTUZ8dcYKEA7T7qRURz.jpg',
+    'https://image.tmdb.org/t/p/w185_and_h278_bestv2/gjAFM4xhA5vyLxxKMz38ujlUfDL.jpg',
+    'https://image.tmdb.org/t/p/w185_and_h278_bestv2/qcnOKCPleLOTWPPgYI0YT1MOQwR.jpg']
+
+
+const windowSize = window.matchMedia("(max-width: 450px)")
+
+function mediaQuery(windowSize){
+    const editBtns = document.querySelectorAll('.edit')
+    const deleteBtns = document.querySelectorAll('.delete')
+
+    if(windowSize.matches){
+        editBtns.forEach(btn => btn.innerHTML = '<i class="material-icons">edit</i>')
+        deleteBtns.forEach(btn => btn.innerHTML = '<i class="material-icons">delete</i>')
+    }
+    else{
+        editBtns.forEach(btn => btn.textCtonet = 'edit')
+        deleteBtns.forEach(btn => btn.textContent = 'delete') 
+    }
+}
+
+
+module.exports = {addListener, newAlert, addMultipleListeners, posters, posterBacks, mediaQuery, windowSize}
 },{}]},{},[2]);

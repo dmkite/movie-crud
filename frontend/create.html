@@ -8,25 +8,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="css/main.css" />
     <script defer src="bundle.js"></script>
 </head>
 
 <body>
     <header>
-        <!-- <h1><span>C</span>inema <span>R</span>eviewer's <span>U</span>nion of <span>D</span>etroit</h1> -->
-        <nav>
-            <a href="movies.html">Movies</a>
+        <nav class="nav-wrapper">
+            <h1>movie<br>CRUD</h1>
+            <ul id="nav-mobile" class="right">
+                <li><a href="movies.html">Movies</a></li>
+                <li><a href="create.html">Add</a></li>
+            </ul>
+    
         </nav>
     </header>
     <main>
         <div class="alertHolder createHolder"></div>
         <div class="row">
-            <div class="col s12 m6">
+            <div class="col s12 m4">
                 <div class="posterHolder"></div>
             </div>
     
-            <div class="col s12 m6">
+            <div class="col s12 m8">
                 <form class="newMovieForm">
                     <input type="text" id="movieTitle" name="title" required>
                     <label for="movieTitle">Title</label>
